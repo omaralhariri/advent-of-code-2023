@@ -5,8 +5,9 @@ fn main() {
     let lines: Vec<&str> = file.lines().collect();
     let mut failed_games = vec![];
     let mut all_sum: usize = 0;
+    let mut sum_power = 0;
 
-    for (idx, line) in lines.iter().enumerate() {
+    for line in lines.iter() {
         let colon = line.find(":").unwrap();
         let game_no: usize = line.get(5..colon).unwrap().parse::<usize>().unwrap();
         all_sum += game_no;
@@ -18,7 +19,11 @@ fn main() {
             .iter()
             .map(|round| round.split(",").collect::<Vec<_>>())
             .collect();
-        for (index, round) in rounds.iter().enumerate() {
+
+        let mut min_red = 0;
+        let mut min_green = 0;
+        let mut min_blue = 0;
+        for round in rounds.iter() {
             let trimmed: Vec<&str> = round.iter().map(|r| r.trim()).collect();
             for num_color in trimmed.iter() {
                 let space = num_color.find(" ").unwrap();
@@ -31,28 +36,44 @@ fn main() {
                             if !failed_games.contains(&game_no) {
                                 failed_games.push(game_no);
                             }
-                        };
+                        }
+                        if num > min_red {
+                            min_red = num;
+                        }
                     }
                     "green" => {
                         if num > 13 {
                             if !failed_games.contains(&game_no) {
                                 failed_games.push(game_no);
                             }
-                        };
+                        }
+                        if num > min_green {
+                            min_green = num;
+                        }
                     }
                     "blue" => {
                         if num > 14 {
                             if !failed_games.contains(&game_no) {
                                 failed_games.push(game_no);
                             }
-                        };
+                        }
+                        if num > min_blue {
+                            min_blue = num;
+                        }
                     }
                     _ => {}
                 };
             }
         }
+
+        sum_power += min_red * min_green * min_blue;
     }
 
     let sum: usize = failed_games.iter().sum();
-    println!("Sum Failed: {:?}, Sum Success: {:?}", sum, all_sum - sum);
+    println!(
+        "Sum Failed: {:?}, Sum Success: {:?}, Sum Power: {:?}",
+        sum,
+        all_sum - sum,
+        sum_power
+    );
 }
